@@ -1,0 +1,105 @@
+Enum estado_entrada { 
+    revendido 
+    vendido 
+    reservado 
+    cancelado
+}
+
+Enum tipo_evento { 
+    futbol 
+    concierto 
+    teatro 
+    festival
+}
+
+Enum seccion { 
+    norte 
+    sur 
+    este 
+    oeste
+}
+
+Table evento_general { 
+    id Int [pk] 
+    nombre varchar [not null] 
+    tipo_evento tipo_evento [not null]
+    descripcion varchar [not null]
+}
+
+Table evento {
+    id Int [pk] 
+    evento_id Int [ref: > evento_general.id] 
+    fecha date [not null] 
+    hora_inicio timestamp [not null]
+    hora_fin timestamp
+    estadio_id Int [ref: > estadio.id]
+    reglas_entrada text
+}
+
+Table estadio { 
+    id Int [pk] 
+    nombre varchar [not null] 
+    ubicacion varchar [not null]
+    capacidad Int [not null] 
+    ciudad varchar [not null]
+    pais varchar [not null]
+}
+
+Table area { 
+    id Int [pk] 
+    precio_area Float [not null]
+    nombre varchar [not null]
+    seccion seccion [not null]
+    estadio_id Int [ref: > estadio.id]
+}
+
+Table fila { 
+    id Int [pk] 
+    nombre varchar [not null]
+    area_id Int [ref: > area.id]
+}
+
+Table sillas { 
+    id Int [pk] 
+    fila_id Int [ref: > fila.id]
+}
+
+Table entrada { 
+    id Int [pk] 
+    cliente_id Int [ref: > cliente.id]
+    evento_id Int [ref: > evento.id] 
+    precio Float [not null] 
+    cantidad Int [not null]
+    silla Int [not null]
+    fila Int [not null]
+    area varchar [not null]
+    estado estado_entrada [not null]
+}
+
+Table cliente { 
+    id Int [pk] 
+    nombre varchar [not null] 
+    apellido varchar [not null]
+    telefono varchar [not null]
+    email varchar [not null]
+}
+
+Table parqueo { 
+    id Int [pk] 
+    nombre varchar [not null] 
+    ubicacion varchar [not null]
+    estadio_id Int [ref: > estadio.id]
+    precio Float [not null]
+    capacidad Int [not null] 
+}
+
+Table ticket_parqueo { 
+    id Int [pk] 
+    cliente_id Int [ref: > cliente.id]
+    parqueo_id Int [ref: > parqueo.id] 
+    fecha date [not null] 
+    hora_inicio timestamp [not null]
+    hora_fin timestamp [not null]
+    estado estado_entrada [not null]
+}
+
