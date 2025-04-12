@@ -63,6 +63,7 @@ CREATE TABLE fila(
 CREATE TABLE asiento(
     id SERIAL PRIMARY KEY,
     numero INT NOT NULL,
+    disponible BOOLEAN NOT NULL DEFAULT TRUE,
     fila_id INT REFERENCES fila(id) ON DELETE CASCADE
 );
 
