@@ -387,10 +387,10 @@ INSERT INTO entradas (cliente_id, evento_id, area_id, fila_id, asiento_id, preci
 
 UPDATE asiento
 SET disponible = FALSE
-WHERE id_asiento IN (
+WHERE id IN (
     SELECT asiento_id
     FROM entradas
-    WHERE estado IN ('reservada', 'comprada')
+    WHERE estado IN ('reservada', 'pagada')
 );
 
 
