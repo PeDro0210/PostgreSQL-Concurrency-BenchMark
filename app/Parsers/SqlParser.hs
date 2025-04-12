@@ -1,8 +1,8 @@
 module Parsers.SqlParser where
 import Data.List (isSuffixOf)
 
-parser:: String -> IO [String]
-parser file = do  
+parser:: String -> String -> IO [String]
+parser file null_val = do  
         contents <- readFile file
         let lines = words contents
         
@@ -19,15 +19,15 @@ parser file = do
         -- lines value and soo on
         --
         -- I'm bad asf explaining, but meh
-        let (queries, _) = foldl (\(accQueries, currentQuery) line ->
-                             query_concatenator line currentQuery accQueries
+        let (queries, _) = foldl (\(accQueries, currentQuery)  line ->
+                             query_concatenator line null_val currentQuery accQueries
                          ) ([], "") lines
         return queries 
 
 
-query_concatenator :: String -> String -> [String] -> ([String], String)
-query_concatenator line currentQuery completedQueries =
-  if isSuffixOf ";" line
+query_concatenator :: String -> String -> String -> [String] -> ([String], String)
+query_concatenator line null_val currentQuery completedQueries =
+  if isSuffixOf null_val line
     then 
       let fullQuery = currentQuery ++ line
       in (completedQueries ++ [fullQuery], "")
