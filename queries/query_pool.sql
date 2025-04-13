@@ -1,12 +1,21 @@
-BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+with client AS (
+  INSERT INTO cliente (nombre, apellido, email, telefono) 
+  VALUES ('Pegdro', 'Vega', 'carolina.vega@example.com', '2930313233')
+  RETURNING id
+)
 
 INSERT INTO entradas (cliente_id, evento_id, area_id, fila_id, asiento_id, precio, cantidad, estado)
-VALUES (15, 5, 1, 1, 4, 150.00, 1, 'reservada');
+SELECT id, 5, 1, 1, 125, 150.00, 1, 'reservada'
+FROM client;
 
 UPDATE asiento
 SET disponible = FALSE
-WHERE id = 4;
+WHERE id = 125;
+
 
 COMMIT;
-
 -
+
+

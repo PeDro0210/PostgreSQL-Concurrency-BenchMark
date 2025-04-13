@@ -15,11 +15,10 @@ forkThreads n action = do
     forkIO $ do
       action
       putMVar doneVar () -- signal completion
-
-  -- Wait for all threads to complete
+      -- Wait for all threads to complete
   forM_ doneVars takeMVar
 
-threadRunner :: [[String]] -> IO ()
-threadRunner queries = do
+threadRunner :: [[String]] -> Int -> IO ()
+threadRunner queries n = do
   mutex <- newMVar ()
-  mapM_ (forkThreads 10 . dbConnectionHandler mutex) queries
+  mapM_ (forkThreads n . dbConnectionHandler mutex) queries

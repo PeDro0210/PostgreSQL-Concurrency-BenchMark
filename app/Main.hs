@@ -6,6 +6,7 @@ import System.Directory
 
 main :: IO ()
 main = do
+  -- TODO: add for program arguments
   -- Applying the parser
   dir <- getCurrentDirectory -- Setting a monoid value in to a value
   let file = dir ++ "/queries/query_pool.sql"
@@ -15,4 +16,4 @@ main = do
   pure_query_pool <- query_pool
   print pure_query_pool
 
-  threadRunner pure_query_pool
+  threadRunner pure_query_pool 5

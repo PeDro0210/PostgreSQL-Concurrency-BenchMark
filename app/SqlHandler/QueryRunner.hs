@@ -3,7 +3,7 @@
 module SqlHandler.QueryRunner where
 
 import Codec.Binary.UTF8.Generic as B
-import Control.Concurrent (MVar, withMVar)
+import Control.Concurrent (MVar, threadDelay, withMVar)
 import Hasql.Connection as Connection
 import qualified Hasql.Connection.Setting as Connection
 import qualified Hasql.Connection.Setting.Connection as Connection
@@ -20,17 +20,17 @@ dbConnectionHandler mutex queries = do
   -- Turns the pg url in to the connection "Functor" (still haven't grasp the full concept)
   let settings = Connection.string "postgresql://pedro0210:idunno_com@localhost:5432/db" -- wtf NIKITA, that hsql documentaiton is ass
   let last_cast = [Connection.connection settings] -- I find this cast soo fucking useless, but still... THE FUCKING LIBRARY WANT'S IT THAT WAY
-  acquireResult <- Connection.acquire last_cast
-
+  acquireResult <-
+    Connection.acquire
+      last_cast
   -- Always remeber your error handleling
-  withMVar mutex $ \_ -> do
-    case acquireResult of
-      Left err -> print err -- for connection errors
-      Right connection -> do
-        result <- SessionInstance.run (queryCallSession queries) connection
-        case result of
-          Left err -> print err
-          Right val -> putStrLn "Query Succed"
+  case acquireResult of
+    Left err -> print err -- for connection errors
+    Right connection -> do
+      result <- SessionInstance.run (queryCallSession queries) connection
+      case result of
+        Left err -> withMVar mutex $ \_ -> do print err
+        Right val -> withMVar mutex $ \_ -> do putStrLn "Query Succed"
 
 queryCallSession :: [String] -> SessionInstance.Session [()]
 queryCallSession queries = do
