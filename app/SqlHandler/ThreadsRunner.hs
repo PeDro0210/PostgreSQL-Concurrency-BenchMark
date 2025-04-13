@@ -5,6 +5,7 @@ import Control.Concurrent.MVar
 import Control.Monad (forM, forM_, replicateM)
 import SqlHandler.QueryRunner (dbConnectionHandler)
 
+-- TODO: fix this function
 forkThreads :: Int -> IO () -> IO ()
 forkThreads n action = do
   doneVars <- replicateM n newEmptyMVar -- showing that is finish
@@ -21,4 +22,4 @@ forkThreads n action = do
 threadRunner :: [String] -> IO ()
 threadRunner queries = do
   mutex <- newMVar ()
-  mapM_ (forkThreads 2 . dbConnectionHandler mutex) queries
+  mapM_ (forkThreads 5 . dbConnectionHandler mutex) queries

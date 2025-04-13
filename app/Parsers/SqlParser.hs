@@ -2,38 +2,38 @@ module Parsers.SqlParser where
 
 import Data.List (isSuffixOf)
 
-parser :: String -> String -> IO [String]
+parser :: String -> String -> IO [[String]]
 parser file null_val = do
   contents <- readFile file
   let lines = words contents
 
-  -- I'm learning soo expect a ton of comments explaining functions and lines
-  -- Is a reduce funciton in simple words, takes the thing you want to accumulatea
-  -- which will be of the returning type that you want, and the function reducer
-  -- which in here is the query_concatenator, which it will pass trough the lines, until
-  -- no more values, can be iterate over it
-  --
-  -- Imagine it like [] and "" are the initial values, and the fold function, will
-  -- take those initial values and pass the function trough the list once, while
-  -- the value of the function will be saved on the selected variables, and that for the next
-  -- lines value and soo on
-  --
-  -- I'm bad asf explaining, but meh
-  let (queries, _) =
+  let (_, _, query_list) =
         foldl
-          ( \(accQueries, currentQuery) line ->
-              queryConcatenator line null_val currentQuery accQueries
+          ( \(actualQuery, actualQueryFamily, queriesFamily) line ->
+              queryConcatenator line null_val actualQuery actualQueryFamily queriesFamily
           )
-          ([], "")
+          ("", [], [])
           lines
-  return queries
+  return query_list
 
-queryConcatenator :: String -> String -> String -> [String] -> ([String], String)
-queryConcatenator line null_val currentQuery completedQueries =
-  if isSuffixOf null_val line
-    then
-      let fullQuery = currentQuery ++ line
-       in (completedQueries ++ [fullQuery], "")
-    else
-      let newCurrent = currentQuery ++ line ++ " "
-       in (completedQueries, newCurrent)
+queryConcatenator :: String -> String -> String -> [String] -> [[String]] -> (String, [String], [[String]])
+queryConcatenator -- ngl, like the way the hsl refactors code
+  line
+  null_val
+  currentQuery
+  currentQueryFamily
+  completedQueriesFamily
+    | null_val `isSuffixOf` line -- pattern for the null_val (separator)
+      =
+        ( "",
+          currentQueryFamily,
+          completedQueriesFamily ++ [currentQueryFamily] -- appends to the family
+        )
+    | ";" `isSuffixOf` line -- for setting end of a query
+      =
+        let fullQuery = currentQuery ++ line
+         in ("", currentQueryFamily ++ [fullQuery], completedQueriesFamily)
+    | otherwise -- self-explanatory asf
+      =
+        let newCurrent = currentQuery ++ line ++ " "
+         in (newCurrent, currentQueryFamily, completedQueriesFamily)

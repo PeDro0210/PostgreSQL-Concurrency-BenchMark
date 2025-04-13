@@ -6,23 +6,13 @@ import System.Directory
 
 main :: IO ()
 main = do
-  -- Applyng the parser
+  -- Applying the parser
   dir <- getCurrentDirectory -- Setting a monoid value in to a value
   let file = dir ++ "/queries/query_pool.sql"
-  -- ->[String]
-  let query_pool = parser file "COMMIT;"
 
-  -- String -> IO()
-  --
-  -- query_pool <$> fork IO hsql_runner
-  -- mutex
-  -- print query
-  -- mutex
-  --
-  --
+  let query_pool = parser file "-"
 
-  -- TODO: Implement hsql client connection
-  -- TODO: implement multithreading
   pure_query_pool <- query_pool
+  print pure_query_pool
 
-  threadRunner pure_query_pool
+-- threadRunner pure_query_pool
