@@ -13,9 +13,10 @@ import Hasql.Session as SessionInstance
 import Hasql.Statement (Statement (Statement))
 
 dbConnectionHandler :: MVar () -> [String] -> IO ()
-dbConnectionHandler mutex query = do
+dbConnectionHandler mutex queries = do
   -- Okay now going serious
 
+  -- TODO: change the connection type to a pool
   -- Turns the pg url in to the connection "Functor" (still haven't grasp the full concept)
   let settings = Connection.string "postgresql://pedro0210:idunno_com@localhost:5432/db" -- wtf NIKITA, that hsql documentaiton is ass
   let last_cast = [Connection.connection settings] -- I find this cast soo fucking useless, but still... THE FUCKING LIBRARY WANT'S IT THAT WAY
@@ -26,15 +27,14 @@ dbConnectionHandler mutex query = do
     case acquireResult of
       Left err -> print err -- for connection errors
       Right connection -> do
-        result <- SessionInstance.run (queryCallSession query) connection
+        result <- SessionInstance.run (queryCallSession queries) connection
         case result of
           Left err -> print err
           Right val -> putStrLn "Query Succed"
 
--- TODO: Change the value of entry as [String] and a mapping function
-queryCallSession :: [String] -> SessionInstance.Session ()
+queryCallSession :: [String] -> SessionInstance.Session [()]
 queryCallSession queries = do
-  SessionInstance.statement () (genericStatement query) -- wraps it in the Session context,
+  sequence (fmap (\query -> SessionInstance.statement () (genericStatement query)) queries) -- wraps it in the Session context,
 
 genericStatement :: String -> Statement () ()
 genericStatement query =

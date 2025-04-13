@@ -15,4 +15,4 @@ main = do
   pure_query_pool <- query_pool
   print pure_query_pool
 
--- threadRunner pure_query_pool
+  threadRunner pure_query_pool
