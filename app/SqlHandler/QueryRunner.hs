@@ -12,7 +12,7 @@ import Hasql.Encoders as Encoders
 import Hasql.Session as SessionInstance
 import Hasql.Statement (Statement (Statement))
 
-dbConnectionHandler :: MVar () -> String -> IO ()
+dbConnectionHandler :: MVar () -> [String] -> IO ()
 dbConnectionHandler mutex query = do
   -- Okay now going serious
 
@@ -32,8 +32,8 @@ dbConnectionHandler mutex query = do
           Right val -> putStrLn "Query Succed"
 
 -- TODO: Change the value of entry as [String] and a mapping function
-queryCallSession :: String -> SessionInstance.Session ()
-queryCallSession query = do
+queryCallSession :: [String] -> SessionInstance.Session ()
+queryCallSession queries = do
   SessionInstance.statement () (genericStatement query) -- wraps it in the Session context,
 
 genericStatement :: String -> Statement () ()
