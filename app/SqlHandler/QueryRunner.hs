@@ -1,36 +1,46 @@
+-- dunno the exact need of this, but the documntaiton says soo
 {-# LANGUAGE OverloadedStrings #-}
 
 module SqlHandler.QueryRunner where
 
 import Codec.Binary.UTF8.Generic as B
 import Control.Concurrent (MVar, threadDelay, withMVar)
+import Data.Time
 import Hasql.Connection as Connection
-import qualified Hasql.Connection.Setting as Connection
-import qualified Hasql.Connection.Setting.Connection as Connection
+import Hasql.Connection.Setting as Connection
+import Hasql.Connection.Setting.Connection as Connection
 import Hasql.Decoders as Decoders
 import Hasql.Encoders as Encoders
 import Hasql.Session as SessionInstance
 import Hasql.Statement (Statement (Statement))
+import Text.Printf (printf)
 
 dbConnectionHandler :: MVar () -> [String] -> IO ()
 dbConnectionHandler mutex queries = do
   -- Okay now going serious
 
-  -- TODO: change the connection type to a pool
   -- Turns the pg url in to the connection "Functor" (still haven't grasp the full concept)
   let settings = Connection.string "postgresql://pedro0210:idunno_com@localhost:5432/db" -- wtf NIKITA, that hsql documentaiton is ass
   let last_cast = [Connection.connection settings] -- I find this cast soo fucking useless, but still... THE FUCKING LIBRARY WANT'S IT THAT WAY
   acquireResult <-
     Connection.acquire
       last_cast
+
+  start <- getCurrentTime
   -- Always remeber your error handleling
   case acquireResult of
     Left err -> print err -- for connection errors
     Right connection -> do
       result <- SessionInstance.run (queryCallSession queries) connection
+      stop <- getCurrentTime
+
+      -- Ton of time type casting
+      let timePassed = diffUTCTime stop start -- get's the difference
+      let timeParsed = nominalDiffTimeToSeconds timePassed -- pass that differente in to the Pico type, which can be cast in to a rational number
+      let timeReal = toRational timeParsed -- Rational can be casted to any number type
       case result of
-        Left err -> withMVar mutex $ \_ -> do print err
-        Right val -> withMVar mutex $ \_ -> do putStrLn "Query Succed"
+        Left err -> withMVar mutex $ \_ -> printf "| %.5f | Failed |\n" (fromRational timeReal :: Double) -- the cool casting
+        Right val -> withMVar mutex $ \_ -> printf "| %.5f | Succed |\n" (fromRational timeReal :: Double)
 
 queryCallSession :: [String] -> SessionInstance.Session [()]
 queryCallSession queries = do
