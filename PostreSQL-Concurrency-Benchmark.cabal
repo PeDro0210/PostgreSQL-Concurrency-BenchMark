@@ -71,7 +71,7 @@ executable PostreSQL-Concurrency-Benchmark
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:base ^>=4.17.2.1, hasql ^>=1.9.1.2, directory
+    build-depends:base ^>=4.17.2.1, hasql ==1.9.1.2, directory, utf8-string, text
 
     -- Directories containing source files.
     hs-source-dirs:   app

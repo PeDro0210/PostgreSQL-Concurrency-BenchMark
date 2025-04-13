@@ -3,6 +3,7 @@ module SqlHandler.ThreadsRunner where
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Concurrent.MVar
 import Control.Monad (forM, forM_, replicateM)
+import SqlHandler.QueryRunner (dbConnectionHandler)
 
 forkThreads :: Int -> IO () -> IO ()
 forkThreads n action = do
@@ -27,4 +28,4 @@ printThreadCurrentQuery mutex query = do
 threadRunner :: [String] -> IO ()
 threadRunner queries = do
   mutex <- newMVar ()
-  mapM_ (forkThreads 2 . printThreadCurrentQuery mutex) queries
+  mapM_ (forkThreads 2 . dbConnectionHandler mutex) queries

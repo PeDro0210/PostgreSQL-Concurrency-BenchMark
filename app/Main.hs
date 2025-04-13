@@ -23,7 +23,6 @@ main = do
 
   -- TODO: Implement hsql client connection
   -- TODO: implement multithreading
-  print =<< query_pool
   pure_query_pool <- query_pool
 
   threadRunner pure_query_pool
