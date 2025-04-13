@@ -18,13 +18,6 @@ forkThreads n action = do
   -- Wait for all threads to complete
   forM_ doneVars takeMVar
 
--- TODO: Change this with the query runner
-printThreadCurrentQuery :: MVar () -> String -> IO ()
-printThreadCurrentQuery mutex query = do
-  withMVar mutex $ \_ -> do
-    threadDelay 100000
-    putStrLn $ "Current query: " ++ query
-
 threadRunner :: [String] -> IO ()
 threadRunner queries = do
   mutex <- newMVar ()
