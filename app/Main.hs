@@ -20,8 +20,6 @@ main = do
 
       pure_query_pool <- query_pool
 
-      print pure_query_pool
-
       let parsed_n = read n
       threadRunner pure_query_pool parsed_n uri
     _ -> do putStrLn "Error: Not all arguments where put"
