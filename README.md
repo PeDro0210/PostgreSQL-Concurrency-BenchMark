@@ -34,6 +34,6 @@ cabal run exes -- <queries path> <uri> <separator-value> <threads quantity>
 
 ### Use Example
 
->``` bash
->cabal run exes -- queries/query_pool.sql postgresql://pedro0210:idunno_com@localhost:5432/db - 30
->```
+``` bash
+cabal run exes -- queries/query_pool.sql postgresql://pedro0210:idunno_com@localhost:5432/db - 30
+```
