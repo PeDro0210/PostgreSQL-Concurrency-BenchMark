@@ -16,7 +16,6 @@ A haskell-project oriented for testing concurrent queries to any postreSQL DB
    ghcup install cabal
    ```
 
-   ```
 - Clone the repo
 
   ```bash
