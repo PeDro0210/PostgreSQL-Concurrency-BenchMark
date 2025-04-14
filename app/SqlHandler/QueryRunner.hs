@@ -36,7 +36,11 @@ dbConnectionHandler mutex queries connectionString = do
   case acquireResult of
     Left err -> print err -- for connection errors
     Right connection -> do
-      result <- SessionInstance.run (queryCallSession queries) connection
+      result <-
+        SessionInstance.run
+          (queryCallSession queries)
+          connection
+
       stop <- getCurrentTime
 
       -- Ton of time type casting
@@ -44,14 +48,22 @@ dbConnectionHandler mutex queries connectionString = do
       let timeParsed = nominalDiffTimeToSeconds timePassed -- pass that differente in to the Pico type, which can be cast in to a rational number
       let timeReal = toRational timeParsed -- Rational can be casted to any number type
       case result of
-        Left err -> withMVar mutex $ \_ -> do
-          printf "| %.5f | Failed |\n" (fromRational timeReal :: Double) -- the cool casting
-        Right val -> withMVar mutex $ \_ -> do
-          printf "| %.5f | Succed |\n" (fromRational timeReal :: Double)
+        Left err ->
+          printf "-> %.5f | Failed |\n" (fromRational timeReal :: Double) -- the cool casting
+        Right val ->
+          printf "-> %.5f | Succed |\n" (fromRational timeReal :: Double)
 
 queryCallSession :: [String] -> SessionInstance.Session [()]
 queryCallSession queries = do
-  sequence (fmap (\query -> SessionInstance.statement () (genericStatement query)) queries) -- wraps it in the Session context,
+  sequence
+    ( fmap
+        ( \query ->
+            SessionInstance.statement
+              ()
+              (genericStatement query)
+        )
+        queries -- wraps it in the Session context,
+    )
 
 genericStatement :: String -> Statement () ()
 genericStatement query =

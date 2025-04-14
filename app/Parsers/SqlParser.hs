@@ -12,7 +12,12 @@ parser file null_val = do
         -- ik this ain't pure cause is mutating, but I couldn't find another solution
         foldl
           ( \(actualQuery, actualQueryFamily, queriesFamily) line ->
-              queryConcatenator line null_val actualQuery actualQueryFamily queriesFamily
+              queryConcatenator
+                line
+                null_val
+                actualQuery
+                actualQueryFamily
+                queriesFamily
           )
           ("", [], [])
           lines

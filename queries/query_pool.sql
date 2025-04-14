@@ -7,12 +7,12 @@ with client AS (
 )
 
 INSERT INTO entradas (cliente_id, evento_id, area_id, fila_id, asiento_id, precio, cantidad, estado)
-SELECT id, 5, 1, 1, 222, 150.00, 1, 'reservada'
+SELECT id, 5, 1, 1, 110, 150.00, 1, 'reservada'
 FROM client;
 
 UPDATE asiento
 SET disponible = FALSE
-WHERE id = 222;
+WHERE id = 110;
 
 
 COMMIT;
@@ -27,12 +27,12 @@ with client AS (
 )
 
 INSERT INTO entradas (cliente_id, evento_id, area_id, fila_id, asiento_id, precio, cantidad, estado)
-SELECT id, 5, 1, 1, 223, 150.00, 1, 'reservada'
+SELECT id, 5, 1, 1, 111, 150.00, 1, 'reservada'
 FROM client;
 
 UPDATE asiento
 SET disponible = FALSE
-WHERE id = 223;
+WHERE id = 111;
 
 
 COMMIT;
@@ -47,13 +47,34 @@ with client AS (
 )
 
 INSERT INTO entradas (cliente_id, evento_id, area_id, fila_id, asiento_id, precio, cantidad, estado)
-SELECT id, 5, 1, 1, 225, 150.00, 1, 'reservada'
+SELECT id, 5, 1, 1, 112, 150.00, 1, 'reservada'
 FROM client;
 
 UPDATE asiento
 SET disponible = FALSE
-WHERE id = 225;
+WHERE id = 112;
 
 
 COMMIT;
 -
+
+UPDATE asiento
+SET disponible = TRUE
+WHERE id = 109;
+
+
+UPDATE asiento
+SET disponible = TRUE
+WHERE id = 110;
+
+UPDATE asiento
+SET disponible = TRUE
+WHERE id = 111;
+
+UPDATE asiento
+SET disponible = TRUE
+WHERE id = 112;
+
+-
+
+
