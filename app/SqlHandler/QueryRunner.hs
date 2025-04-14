@@ -44,8 +44,10 @@ dbConnectionHandler mutex queries connectionString = do
       let timeParsed = nominalDiffTimeToSeconds timePassed -- pass that differente in to the Pico type, which can be cast in to a rational number
       let timeReal = toRational timeParsed -- Rational can be casted to any number type
       case result of
-        Left err -> withMVar mutex $ \_ -> printf "| %.5f | Failed |\n" (fromRational timeReal :: Double) -- the cool casting
-        Right val -> withMVar mutex $ \_ -> printf "| %.5f | Succed |\n" (fromRational timeReal :: Double)
+        Left err -> withMVar mutex $ \_ -> do
+          printf "| %.5f | Failed |\n" (fromRational timeReal :: Double) -- the cool casting
+        Right val -> withMVar mutex $ \_ -> do
+          printf "| %.5f | Succed |\n" (fromRational timeReal :: Double)
 
 queryCallSession :: [String] -> SessionInstance.Session [()]
 queryCallSession queries = do

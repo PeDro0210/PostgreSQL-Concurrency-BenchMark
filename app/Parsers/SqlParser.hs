@@ -7,7 +7,9 @@ parser file null_val = do
   contents <- readFile file
   let lines = words contents
 
+  -- acumulator example
   let (_, _, query_list) =
+        -- ik this ain't pure cause is mutating, but I couldn't find another solution
         foldl
           ( \(actualQuery, actualQueryFamily, queriesFamily) line ->
               queryConcatenator line null_val actualQuery actualQueryFamily queriesFamily
@@ -26,7 +28,7 @@ queryConcatenator -- ngl, like the way the hsl refactors code
     | null_val `isSuffixOf` line -- pattern for the null_val (separator)
       =
         ( "",
-          currentQueryFamily,
+          [],
           completedQueriesFamily ++ [currentQueryFamily] -- appends to the family
         )
     | ";" `isSuffixOf` line -- for setting end of a query
