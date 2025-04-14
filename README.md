@@ -5,10 +5,10 @@ A haskell-project oriented for testing concurrent queries to any postreSQL DB
 ## How to setup
 
 - Install Ghcup
-   > [!NOTE]
+   > **Note**
    > There are many ways to install Ghcup, but there are different setups depending your OS,
    > that's why I won't show you how to do it in here, but you can have the installation instructions:
-   > <https://www.haskell.org/ghcup/install/>
+   > [Installation Page](https://www.haskell.org/ghcup/install/)
 >
 - Install Cabal with Ghcup
 
