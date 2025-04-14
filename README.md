@@ -5,6 +5,7 @@ A haskell-project oriented for testing concurrent queries to any postreSQL DB
 ## How to setup
 
 - Install Ghcup
+
    > **Note**
    >
    > There are many ways to install Ghcup, but there are different setups depending your OS,
