@@ -1,19 +1,30 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
+import Codec.Binary.UTF8.Generic (fromString)
+import GHC.Exception (ErrorCall (ErrorCall))
 import Parsers.SqlParser
 import SqlHandler.ThreadsRunner (threadRunner)
 import System.Directory
+import System.Directory.Internal.Prelude (getArgs)
 
 main :: IO ()
 main = do
   -- TODO: add for program arguments
   -- Applying the parser
-  dir <- getCurrentDirectory -- Setting a monoid value in to a value
-  let file = dir ++ "/queries/query_pool.sql"
 
-  let query_pool = parser file "-"
+  -- Argument order : exec_name <sql file path in relative> <pgsql uri> <separator_string> <thread number>
+  args <- getArgs
+  case args of
+    [path, uri, null_val, n] -> do
+      dir <- getCurrentDirectory -- Setting a monoid value in to a value
+      let file = dir ++ "/" ++ path
 
-  pure_query_pool <- query_pool
-  print pure_query_pool
+      let query_pool = parser file null_val
 
-  threadRunner pure_query_pool 5
+      pure_query_pool <- query_pool
+
+      let parsed_n = read n
+      threadRunner pure_query_pool parsed_n uri
+    _ -> do putStrLn "Error: Not all arguments where put"

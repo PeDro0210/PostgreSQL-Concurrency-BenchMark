@@ -7,12 +7,12 @@ with client AS (
 )
 
 INSERT INTO entradas (cliente_id, evento_id, area_id, fila_id, asiento_id, precio, cantidad, estado)
-SELECT id, 5, 1, 1, 198, 150.00, 1, 'reservada'
+SELECT id, 5, 1, 1, 112, 150.00, 1, 'reservada'
 FROM client;
 
 UPDATE asiento
 SET disponible = FALSE
-WHERE id = 198;
+WHERE id = 112;
 
 
 COMMIT;

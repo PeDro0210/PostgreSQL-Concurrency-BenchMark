@@ -1,11 +1,10 @@
 module SqlHandler.ThreadsRunner where
 
-import Control.Concurrent (forkIO, threadDelay)
+import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar
-import Control.Monad (forM, forM_, replicateM)
+import Control.Monad (forM_, replicateM)
 import SqlHandler.QueryRunner (dbConnectionHandler)
 
--- TODO: fix this function
 forkThreads :: Int -> IO () -> IO ()
 forkThreads n action = do
   doneVars <- replicateM n newEmptyMVar -- showing that is finish
@@ -18,7 +17,7 @@ forkThreads n action = do
       -- Wait for all threads to complete
   forM_ doneVars takeMVar
 
-threadRunner :: [[String]] -> Int -> IO ()
-threadRunner queries n = do
+threadRunner :: [[String]] -> Int -> String -> IO ()
+threadRunner queries n uri = do
   mutex <- newMVar ()
-  mapM_ (forkThreads n . dbConnectionHandler mutex) queries
+  mapM_ (\query -> forkThreads n (dbConnectionHandler mutex query uri)) queries
