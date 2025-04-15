@@ -19,8 +19,7 @@ import Text.Printf (printf)
 dbConnectionHandler :: MVar () -> [String] -> String -> IO ()
 dbConnectionHandler mutex queries connectionString = do
   -- Okay now going serious
-  -- "postgresql://pedro0210:idunno_com@localhost:5432/db"
-  --
+
   -- Turns the pg url in to the connection "Functor" (still haven't grasp the full concept)
 
   let parsedConnection = Dt.pack connectionString
