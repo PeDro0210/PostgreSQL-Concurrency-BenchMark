@@ -5,52 +5,59 @@ module SqlHandler.QueryRunner where
 
 import Codec.Binary.UTF8.Generic as B
 import Control.Concurrent (MVar, threadDelay, withMVar)
+import Control.Exception (bracket)
+import Control.Monad.IO.Class (liftIO)
+import Data.Ratio ((%))
 import Data.Text as Dt
 import Data.Time
 import Hasql.Connection as Connection
 import Hasql.Connection.Setting as Connection
 import Hasql.Connection.Setting.Connection as Connection
+import qualified Hasql.Connection.Setting.Connection as ConnSetting
 import Hasql.Decoders as Decoders
 import Hasql.Encoders as Encoders
+import qualified Hasql.Pool as Pool
+import qualified Hasql.Pool.Config as Pool
 import Hasql.Session as SessionInstance
-import Hasql.Statement (Statement (Statement))
+import Hasql.Statement (Statement (..))
+import Text.ParserCombinators.ReadP (satisfy)
 import Text.Printf (printf)
 
-dbConnectionHandler :: MVar () -> [String] -> String -> IO ()
-dbConnectionHandler mutex queries connectionString = do
-  -- Okay now going serious
-
-  -- Turns the pg url in to the connection "Functor" (still haven't grasp the full concept)
-
+dbConnectionHandler :: Int -> [String] -> String -> IO ()
+dbConnectionHandler thread_n queries connectionString = do
+  -- Text Parsing for satisfying the pool.settings
   let parsedConnection = Dt.pack connectionString
 
-  let settings = Connection.string parsedConnection -- wtf NIKITA, that hsql documentaiton is ass
-  let last_cast = [Connection.connection settings] -- I find this cast soo fucking useless, but still... THE FUCKING LIBRARY WANT'S IT THAT WAY
-  acquireResult <-
-    Connection.acquire
-      last_cast
+  -- Fucking stupid
+  -- Ik is kinda dumb reinstanciate it the pool everytime, but it works also
+  let poolSettings =
+        Pool.settings -- Fucking stupid documentation of the pool
+          [ Pool.size thread_n,
+            Pool.acquisitionTimeout 10,
+            Pool.agingTimeout 1800,
+            Pool.idlenessTimeout 1800,
+            Pool.staticConnectionSettings
+              [Connection.connection (ConnSetting.string parsedConnection)]
+          ]
 
-  start <- getCurrentTime
-  -- Always remeber your error handleling
-  case acquireResult of
-    Left err -> print err -- for connection errors
-    Right connection -> do
-      result <-
-        SessionInstance.run
-          (queryCallSession queries)
-          connection
+  -- passing each pool and running the statement
+  bracket (Pool.acquire poolSettings) Pool.release $ \pool -> do
+    start <- getCurrentTime
 
-      stop <- getCurrentTime
+    result <- Pool.use pool (queryCallSession queries)
 
-      -- Ton of time type casting
-      let timePassed = diffUTCTime stop start -- get's the difference
-      let timeParsed = nominalDiffTimeToSeconds timePassed -- pass that differente in to the Pico type, which can be cast in to a rational number
-      let timeReal = toRational timeParsed -- Rational can be casted to any number type
-      case result of
-        Left err ->
-          printf "-> %.5f | Failed |\n" (fromRational timeReal :: Double) -- the cool casting
-        Right val ->
-          printf "-> %.5f | Succed |\n" (fromRational timeReal :: Double)
+    stop <- getCurrentTime
+
+    -- ignore this fucking whole parsing process
+    let timePassed = diffUTCTime stop start
+    let timeParsed = nominalDiffTimeToSeconds timePassed
+    let timeReal = toRational timeParsed
+
+    case result of
+      Left err ->
+        printf "-> %.5f | Failed |\n" (fromRational timeReal :: Double)
+      Right _ ->
+        printf "-> %.5f | Succed |\n" (fromRational timeReal :: Double)
 
 queryCallSession :: [String] -> SessionInstance.Session [()]
 queryCallSession queries = do

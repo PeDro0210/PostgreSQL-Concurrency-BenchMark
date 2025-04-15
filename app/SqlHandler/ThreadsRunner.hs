@@ -24,6 +24,6 @@ threadRunner queries n uri = do
     ( \query ->
         forkThreads
           n
-          (dbConnectionHandler mutex query uri)
+          (dbConnectionHandler n query uri)
     )
     queries

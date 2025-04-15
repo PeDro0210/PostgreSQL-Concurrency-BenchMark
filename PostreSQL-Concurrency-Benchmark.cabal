@@ -51,7 +51,7 @@ extra-doc-files:    CHANGELOG.md
 -- extra-source-files:
 
 common warnings
-    ghc-options: -Wall
+    ghc-options: -Wall -threaded 
 
 executable PostreSQL-Concurrency-Benchmark
     -- Import common warning flags.
@@ -71,7 +71,7 @@ executable PostreSQL-Concurrency-Benchmark
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:base ^>=4.17.2.1, hasql ==1.9.1.2, directory, utf8-string, text, time
+    build-depends:base ^>=4.17.2.1, hasql ==1.9.1.2, hasql-pool ==1.3.0.1, directory, utf8-string, text, time
 
     -- Directories containing source files.
     hs-source-dirs:   app
