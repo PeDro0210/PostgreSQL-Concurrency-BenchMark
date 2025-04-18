@@ -5,6 +5,7 @@ module SqlHandler.QueryRunner where
 
 import Codec.Binary.UTF8.Generic as B
 import Data.Time
+import GHC.IO.Exception (stackOverflow)
 import Hasql.Decoders as Decoders
 import Hasql.Encoders as Encoders
 import qualified Hasql.Pool as TPool
@@ -12,36 +13,34 @@ import Hasql.Session as SessionInstance
 import Hasql.Statement (Statement (..))
 import Text.Printf (printf)
 
-dbConnectionHandler :: [String] -> TPool.Pool  -> IO ()
+dbConnectionHandler :: [String] -> TPool.Pool -> IO ()
 dbConnectionHandler queries pool = do
-  -- Text Parsing for satisfying the pool.settings
-   start <- getCurrentTime
+  start <- getCurrentTime
 
-   result <- TPool.use pool (queryCallSession queries)
+  result <- TPool.use pool (queryCallSession queries)
 
-   stop <- getCurrentTime
+  stop <- getCurrentTime
 
-   -- ignore this fucking whole parsing process
-   let timePassed = diffUTCTime stop start
-   let timeParsed = nominalDiffTimeToSeconds timePassed
-   let timeReal = toRational timeParsed
-
-   case result of
-     Left err -> do
-       printf "-> %.5f | Failed |\n" (fromRational timeReal :: Double)
-     Right _ ->
-       printf "-> %.5f | Succed |\n" (fromRational timeReal :: Double)
+  -- ignore this fucking whole casting process
+  let timePassed = diffUTCTime stop start -- do the diff between 2 UTCTime
+  let timeParsed = nominalDiffTimeToSeconds timePassed -- cast it's
+  let timeReal = toRational timeParsed -- found it on a stackOverflow post, I didn't found a way to cast it directly to a double type
+  case result of
+    Left _ -> do
+      printf "-> %.5f | Failed |\n" (fromRational timeReal :: Double)
+    Right _ ->
+      printf "-> %.5f | Succed |\n" (fromRational timeReal :: Double)
 
 queryCallSession :: [String] -> SessionInstance.Session [()]
 queryCallSession queries = do
-  sequence
-    ( fmap
+  sequence -- wraps all the queries element in to the Session context,
+    ( map
         ( \query ->
             SessionInstance.statement
               ()
               (genericStatement query)
         )
-        queries -- wraps it in the Session context,
+        queries
     )
 
 genericStatement :: String -> Statement () ()
